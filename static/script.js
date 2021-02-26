@@ -35,4 +35,3 @@ function leave_room() {
          window.location.href = "/leave";
     });
 }
-

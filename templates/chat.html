@@ -3,13 +3,78 @@
     <head>
         <title>Penguin Coders Chat</title>
         <!--Link to CSS -->
-        <link href="../static/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
         <link href="../static/style.css" rel="stylesheet">
 
         <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+        <script src="https://connect.soundcloud.com/sdk/sdk-3.3.2.js"></script>
 
-        <script type="text/javascript" charset="utf-8" src="../static/script.js">
+
+        <script type="text/javascript" charset="utf-8" src="../static/script.js"></script>
+
+        <script type="text/javascript" charset="utf-8">
+            function playMusic(id) {
+                SC.stream(`/tracks/${id}`)
+                    .then(function(player){
+                        player.play().then(function(){
+                            console.log('Playback started!');
+                        }).catch(function(e){
+                            console.error('Playback rejected. Try calling play() from a user interaction.', e);
+                        });
+                    });
+            }
+
+
+
+            function searchMusic() {
+                let runningElement = null;
+                var name = document.getElementById('info').value;
+                console.log(name);
+
+                SC.initialize({
+                    client_id: "{{clientID}}"
+                });
+
+                SC.get('/tracks', {
+                    q: name
+                    }).then(function(tracks) {
+
+                        console.log("get back res");
+                        console.log(tracks);
+
+                        var res_div = document.getElementById("return-result");
+                        res_div.innerHTML = ""
+
+                        for (let i = 0; i < tracks.length; i ++) {
+                            let newElement = document.createElement('div');
+                            var image_ele;
+                            newElement.className = "card";
+
+                            console.log(tracks[i].id)
+                            if( tracks[i].artwork_url != null) {
+                                image_ele = `<img src= ${tracks[i].artwork_url} alt="result" max-width="10%">`
+                            } else {
+                                image_ele = ''
+                            }
+
+
+                            newElement.innerHTML = ` ${image_ele} <div> <p>Name: ${tracks[i].title}</p> <p>Artist: ${tracks[i].user.username}</p><div>`;
+
+                            newElement.onclick = function() {
+                                playMusic(tracks[i].id);
+                                if (runningElement != null) {
+                                    runningElement.style.backgroundColor = "#e6e6e6";
+                                }
+                                newElement.style.backgroundColor = "#4cede2";
+                                runningElement = newElement
+                            }
+
+                            res_div.appendChild(newElement);
+                        }
+                });
+            }
+
         </script>
     </head>
 
@@ -17,6 +82,17 @@
         <div class="chatwindow">
             <h2>Chat window</h2>
             <h2>Room: {{session['room']}}</h2> <br>
+
+            <div class="input-group">
+                <input id="info" type="text" class="form-control" placeholder="Search">
+                <div class="input-group-btn">
+                    <button class="btn btn-outline-success" type="submit" onclick=searchMusic()>Search</button>
+                </div>
+            </div>
+
+            <div id="return-result" class="cards-wrapper">
+
+            </div>
 
             <textarea id="chat" cols="70" rows="10" placeholder="No messages yet. Start one..."></textarea><br /><br />
             <input type="text" id="text" size="60" placeholder="Enter your message here" />

@@ -29,7 +29,7 @@ def chat():
         username, room = request.form["username"], request.form["room"]
         session["username"] = username
         session["room"] = room
-        return render_template("chat.html", session=session)
+        return render_template("chat.html", session=session, clientID=str(os.getenv('CLIENT_ID')))
     else:
         # check if user login
         if "username" in session:
