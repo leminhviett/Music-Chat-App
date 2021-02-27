@@ -66,5 +66,14 @@ def leave(message):
     emit('status', name + " has left", room=room)
 
 
+@socket.on('play_music', namespace='/chat')
+def play_music(id):
+    room = session['room']
+    name = session['username']
+    print("broad cast music")
+    emit('play_music', id, room=room)
+    emit('message', name + "'s just played a music", room=room)
+
+
 if __name__ == '__main__':
     socket.run(app)

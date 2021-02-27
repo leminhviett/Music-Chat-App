@@ -12,34 +12,19 @@
 
 
         <script type="text/javascript" charset="utf-8" src="../static/script.js"></script>
-
-        <script type="text/javascript" charset="utf-8">
-            function playMusic(id) {
-                SC.stream(`/tracks/${id}`)
-                    .then(function(player){
-                        player.play().then(function(){
-                            console.log('Playback started!');
-                        }).catch(function(e){
-                            console.error('Playback rejected. Try calling play() from a user interaction.', e);
-                        });
-                    });
-            }
-
-
+        <script>
+            SC.initialize({
+                client_id: "{{clientID}}"
+            });
 
             function searchMusic() {
                 let runningElement = null;
                 var name = document.getElementById('info').value;
                 console.log(name);
 
-                SC.initialize({
-                    client_id: "{{clientID}}"
-                });
-
                 SC.get('/tracks', {
                     q: name
-                    }).then(function(tracks) {
-
+                }).then(function(tracks) {
                         console.log("get back res");
                         console.log(tracks);
 
@@ -72,9 +57,8 @@
 
                             res_div.appendChild(newElement);
                         }
-                });
+                    });
             }
-
         </script>
     </head>
 

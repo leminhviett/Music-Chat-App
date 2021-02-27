@@ -1,4 +1,4 @@
-var socket;
+let socket;
 
 $(document).ready(function(){
     socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
@@ -26,6 +26,12 @@ $(document).ready(function(){
             $('#text').val('');
             socket.emit('message', text);
     });
+
+    // stream music to others
+    socket.on('play_music', function(id) {
+        console.log("get the music", id);
+        broadcastMusic(id);
+    })
 });
 
 function leave_room() {
@@ -34,4 +40,28 @@ function leave_room() {
         // go to leave function to clear session
          window.location.href = "/leave";
     });
+}
+
+function broadcastMusic(id) {
+    SC.stream(`/tracks/${id}`)
+        .then(function(player){
+            player.play().then(function(){
+                console.log('Playback started!');
+            }).catch(function(e){
+                console.error('Playback rejected. Try calling play() from a user interaction.', e);
+            });
+        });
+}
+
+function playMusic(id) {
+//    SC.stream(`/tracks/${id}`)
+//        .then(function(player){
+//            player.play().then(function(){
+//                console.log('Playback started!');
+//            }).catch(function(e){
+//                console.error('Playback rejected. Try calling play() from a user interaction.', e);
+//            });
+//        });
+
+    socket.emit('play_music', id)
 }
