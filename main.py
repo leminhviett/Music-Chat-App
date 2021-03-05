@@ -2,12 +2,13 @@ from flask_cors import CORS
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import os
-import soundcloud
+
+from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path  # Python 3.6+ only
+
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
-
 
 app = Flask(__name__)
 socket = SocketIO(app, manage_session=False, cors_allowed_origins="*")
@@ -22,6 +23,7 @@ def index():
     if 'username' in session:
         return redirect(url_for("chat"))
     return render_template("index.html")
+
 
 @app.route("/chat", methods=['GET', 'POST'])
 def chat():
@@ -46,34 +48,57 @@ def leave():
 
 @socket.on('join', namespace='/chat')
 def join(message):
+    name = session['username']
     room = session['room']
+    time = datetime.now()
+
     join_room(room)
-    emit('status', session['username'] + " has joined", room=room)
+    emit('status', {"username": name, "content": "has joined", "time": parseTime(time)}, room=room)
 
 
 @socket.on('message', namespace='/chat')
 def send_msg(message):
+    name = session['username']
+    room = session['room']
+    time = datetime.now()
+    content = message['content']
+
+    if content == "":
+        return
     # broadcast to everyone in the room of new message
-    emit('message', f"{session['username']} : {message}", room=session['room'])
+    emit('message', {"username": name, "content": content, "time": parseTime(time)}, room=room)
 
 
 @socket.on('leave', namespace='/chat')
 def leave(message):
     room = session['room']
     name = session['username']
-    #cannot clear session here. dk why
+    time = datetime.now()
+
+    # cannot clear session here. dk why
     leave_room(room)
-    emit('status', name + " has left", room=room)
+    emit('status', {"username": name, "content": "has left", "time": parseTime(time)}, room=room)
 
 
 @socket.on('play_music', namespace='/chat')
-def play_music(id):
+def play_music(info):
     room = session['room']
     name = session['username']
-    print("broad cast music")
-    emit('play_music', id, room=room)
-    emit('message', name + "'s just played a music", room=room)
+    print("broadcast music")
+    emit('play_music', {"id" : info['id']}, room=room)
+
+    content = f"'s just played {info['track_name']}"
+    time = datetime.now()
+
+    emit('status', {"username": name, "content": content, "time": parseTime(time)}, room=room)
+
+
+def parseTime(obj):
+    obj = str(obj)
+    date = obj.split(" ")[0]
+    time = ":".join(obj.split(" ")[-1].split(":")[:-1])
+    return f"{time} {date}"
 
 
 if __name__ == '__main__':
-    socket.run(app)
+    socket.run(app, host='0.0.0.0')

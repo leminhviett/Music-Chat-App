@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Penguin Coders Chat</title>
+        <title>Music Chat</title>
         <!--Link to CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
         <link href="../static/style.css" rel="stylesheet">
@@ -10,61 +10,22 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
         <script src="https://connect.soundcloud.com/sdk/sdk-3.3.2.js"></script>
 
-
-        <script type="text/javascript" charset="utf-8" src="../static/script.js"></script>
-        <script>
-            SC.initialize({
-                client_id: "{{clientID}}"
-            });
-
-            function searchMusic() {
-                let runningElement = null;
-                var name = document.getElementById('info').value;
-                console.log(name);
-
-                SC.get('/tracks', {
-                    q: name
-                }).then(function(tracks) {
-                        console.log("get back res");
-                        console.log(tracks);
-
-                        var res_div = document.getElementById("return-result");
-                        res_div.innerHTML = ""
-
-                        for (let i = 0; i < tracks.length; i ++) {
-                            let newElement = document.createElement('div');
-                            var image_ele;
-                            newElement.className = "card";
-
-                            console.log(tracks[i].id)
-                            if( tracks[i].artwork_url != null) {
-                                image_ele = `<img src= ${tracks[i].artwork_url} alt="result" max-width="10%">`
-                            } else {
-                                image_ele = ''
-                            }
-
-
-                            newElement.innerHTML = ` ${image_ele} <div> <p>Name: ${tracks[i].title}</p> <p>Artist: ${tracks[i].user.username}</p><div>`;
-
-                            newElement.onclick = function() {
-                                playMusic(tracks[i].id);
-                                if (runningElement != null) {
-                                    runningElement.style.backgroundColor = "#e6e6e6";
-                                }
-                                newElement.style.backgroundColor = "#4cede2";
-                                runningElement = newElement
-                            }
-
-                            res_div.appendChild(newElement);
-                        }
-                    });
+        <!-- appp config -->
+        <script type="text/javascript">
+            window.appConfig = {
+              username : "{{session['username']}}",
+              client_id : "{{clientID}}"
             }
         </script>
+
+        <!-- custome js -->
+        <script type="text/javascript" charset="utf-8" src="../static/socket.js"></script>
+        <script type="text/javascript" charset="utf-8" src="../static/music.js"></script>
+
     </head>
 
-    <body class="text-center">
-        <div class="chatwindow">
-            <h2>Chat window</h2>
+    <body >
+        <div class="chatwindow container">
             <h2>Room: {{session['room']}}</h2> <br>
 
             <div class="input-group">
@@ -78,10 +39,19 @@
 
             </div>
 
-            <textarea id="chat" cols="70" rows="10" placeholder="No messages yet. Start one..."></textarea><br /><br />
-            <input type="text" id="text" size="60" placeholder="Enter your message here" />
-            <button type="button" id="send" class="btn btn-success">SEND</button><br /><br />
-            <center><button type="button" class="btn btn-danger" onclick=leave_room()>Leave this Chat</button></center>
+            <div class="container">
+                <div class="overflow-auto" id="chat" style="overflow-y: scroll; height:500px;">
+                    
+                </div>    
+            </div>
+
+            <div class="text-center">
+                <input class='form-control' type="text" id="text" size="60" placeholder="Enter your message here" />
+                <br>
+                <button type="button" id="send" class="btn btn-success">SEND</button><br> <br>
+                <center><button type="button" class="btn btn-danger" onclick=leave_room()>Leave this Chat</button></center>
+            </div>
+            
         </div>
 
     </body>
