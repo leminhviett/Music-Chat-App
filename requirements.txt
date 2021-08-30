@@ -1,0 +1,4 @@
+Flask
+flask-socketio==4.*
+flask-cors
+python-dotenv

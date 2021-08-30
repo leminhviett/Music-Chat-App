@@ -1,3 +1,5 @@
+// handling socket events
+
 let socket;
 let myName = window.appConfig.username;
 console.log(myName);

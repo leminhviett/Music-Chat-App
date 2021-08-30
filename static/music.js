@@ -1,3 +1,5 @@
+// stream & play music using Soundcloud SDK
+
 SC.initialize({
     client_id:  window.appConfig.client_id
 });
