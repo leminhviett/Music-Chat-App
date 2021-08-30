@@ -7,7 +7,7 @@ Music is streamt from [Sound-cloud](https://developers.soundcloud.com/docs/api/g
 ## Set up
 
 1. `docker build -t music-chat-app:0.0.1 .`
-2. `docker run -p 5000:5000 -env CLIENT_ID={your soundcloud client id} music-chat-app:0.0.1`
+2. `docker run -p 5000:5000 --env CLIENT_ID={your soundcloud client id} music-chat-app:0.0.1`
 3. Access the app through `localhost:5000`
 
 Final result can be viewed in [images](./images) folder
