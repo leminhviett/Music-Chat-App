@@ -1,6 +1,6 @@
 # Music Chat App
 
-Simple web-application allows users to log-in, chat, and listening music toghether.
+Simple web-application allows users to log-in, chat, and listening music toghether. It also allows user to create & join different rooms. 
 
 Music is streamt from [Sound-cloud](https://developers.soundcloud.com/docs/api/guide).
 
